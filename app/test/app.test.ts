@@ -1,8 +1,9 @@
 import request from "supertest"
 import sinon from "sinon"
-import {app, ErrorMsg, Jwt, User} from "../src"
-import * as RegisterController from "../src/controller/RegisterController"
-import {registerUser} from "../src/controller/RegisterController"
+import {app} from "../src/router/app"
+import {ErrorMsg, Jwt, User} from "../src"
+import {Db} from "../src/postgres/Db"
+import * as register from "../src/service/register"
 
 describe("app", () => {
 
@@ -13,10 +14,12 @@ describe("app", () => {
         password: "testPassword"
     }
 
-    let regUser: sinon.SinonStub<[User], Promise<Jwt>>
+    const db = new Db()
+
+    let regUser: sinon.SinonStub<[User, Db], Promise<Jwt>>
 
     beforeEach(() => {
-        regUser = sinon.stub(RegisterController, "registerUser")
+        regUser = sinon.stub(register, "registerUser")
     })
 
     afterEach(() => {
@@ -28,28 +31,28 @@ describe("app", () => {
         regUser.resolves(jwt)
 
         const response = await request(app).post("/register").send(payload)
-        sinon.assert.calledWithExactly(regUser, payload)
+        sinon.assert.calledWithExactly(regUser, payload, db)
         expect(response.status).toBe(201);
         expect(response.body).toEqual(jwt);
     });
 
     it("should send errorMsg POST", async () => {
-        const errorMsg = new ErrorMsg(404, "Not Found")
+        const errorMsg = new ErrorMsg(404, "Not Found", "No user found")
         regUser.rejects(errorMsg)
 
         const response = await request(app).post("/register").send(payload)
-        sinon.assert.calledWithExactly(regUser, payload)
+        sinon.assert.calledWithExactly(regUser, payload, db)
         expect(response.status).toBe(404);
         expect(response.body).toEqual(errorMsg);
     });
 
     it("should send server error POST for non specified error", async () => {
-        regUser.rejects(new Error())
-
+        const error = new Error()
+        regUser.rejects(error)
         const response = await request(app).post("/register").send(payload)
-        sinon.assert.calledWithExactly(regUser, payload)
+        sinon.assert.calledWithExactly(regUser, payload, db)
         expect(response.status).toBe(500);
-        expect(response.body).toEqual(new ErrorMsg(500, "Server Error"));
+        expect(response.body).toEqual(new ErrorMsg(500, "Server Error", error.message));
     });
 
 })

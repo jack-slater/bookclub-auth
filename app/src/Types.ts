@@ -1,9 +1,16 @@
 
-export interface User {
-    firstName: string,
-    lastName: string,
-    email: string,
+export class User {
+    firstName: string
+    lastName: string
+    email: string
     password: string
+
+    constructor(firstName: string, lastName: string, email: string, password: string) {
+        this.firstName = firstName
+        this.lastName = lastName
+        this.email = email
+        this.password = password
+    }
 }
 
 export interface Jwt {
@@ -11,12 +18,13 @@ export interface Jwt {
 }
 
 export class ErrorMsg {
-    statusCode: number;
-    message: string;
+    statusCode: number
+    cause: string
+    message: string
 
-
-    public constructor(statusCode: number, message: string) {
+    public constructor(statusCode: number, cause: string,  message: string) {
         this.statusCode = statusCode
+        this.cause = cause
         this.message = message
     }
 }
