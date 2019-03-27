@@ -17,12 +17,13 @@ export interface Jwt {
     jwt: string,
 }
 
-export class ErrorMsg {
+export class ErrorMsg extends Error {
     statusCode: number
     cause: string
     message: string
 
     public constructor(statusCode: number, cause: string,  message: string) {
+        super()
         this.statusCode = statusCode
         this.cause = cause
         this.message = message

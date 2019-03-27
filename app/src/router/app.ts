@@ -1,13 +1,16 @@
 import express, {NextFunction, Request, Response} from 'express';
-import {User} from "../Types"
+import {knex} from "../../../db/knex"
+import morgan from "morgan"
 import {asyncMiddleware, clientErrHandler, serverErrHander} from "./middleware"
 import {registerUser} from "../service/register"
 import {Db} from "../postgres/Db"
+import {User} from "../Types"
 
 const app: express.Application = express();
-const db: Db = new Db()
+const db: Db = new Db(knex)
 
 app.use(express.json())
+app.use(morgan("dev"))
 
 app.post('/register', asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     const payload: User = req.body

@@ -9,7 +9,7 @@ export const registerUser = async (user: User, db: Db): Promise<Jwt> => {
         const userId = await db.saveUser(new User(user.firstName, user.lastName, user.email, hashedPassword))
         return await jwtGenerator(userId)
     } catch (e) {
-        return await e
+        return e
     }
 }
 
