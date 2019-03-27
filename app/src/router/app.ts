@@ -4,7 +4,7 @@ import morgan from "morgan"
 import {asyncMiddleware, clientErrHandler, serverErrHander} from "./middleware"
 import {registerUser} from "../service/register"
 import {Db} from "../postgres/Db"
-import {User} from "../Types"
+import {User} from "../types/"
 
 const app: express.Application = express();
 const db: Db = new Db(knex)

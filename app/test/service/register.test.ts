@@ -1,6 +1,6 @@
 import sinon from "sinon"
 import {registerUser} from "../../src/service/register"
-import {Jwt, User} from "../../src"
+import {Jwt, User} from "../../src/types"
 import {Db} from "../../src/postgres/Db"
 import * as encrypter from "../../src/service/encryptPassword"
 import * as jwt from "../../src/service/jwt"
@@ -59,14 +59,13 @@ describe("registerUser", () => {
 
     it("should reject after encrypt error", async () => {
         const error = new Error("Unable to encrypt password")
-
         encryptPassword.rejects(error)
-        const result = await registerUser(user, db)
-
-        sinon.assert.calledWithExactly(encryptPassword, user.password)
-        sinon.assert.notCalled(saveUser)
-        sinon.assert.notCalled(jwtGenerator)
-        expect(result).toEqual(error)
+        await registerUser(user, db).catch(e => {
+            sinon.assert.calledWithExactly(encryptPassword, user.password)
+            sinon.assert.notCalled(saveUser)
+            sinon.assert.notCalled(jwtGenerator)
+            expect(e).toEqual(error)
+        })
     })
 
     it("should reject after db error", async () => {
@@ -74,26 +73,26 @@ describe("registerUser", () => {
 
         encryptPassword.resolves(hashedPassword)
         saveUser.rejects(error)
-        const result = await registerUser(user, db)
-
-        sinon.assert.calledWithExactly(encryptPassword, user.password)
-        sinon.assert.calledWithMatch(saveUser, userWithHashedPwd)
-        sinon.assert.notCalled(jwtGenerator)
-        expect(result).toEqual(error)
+        await registerUser(user, db).catch(e => {
+            sinon.assert.calledWithExactly(encryptPassword, user.password)
+            sinon.assert.calledWithMatch(saveUser, userWithHashedPwd)
+            sinon.assert.notCalled(jwtGenerator)
+            expect(e).toEqual(error)
+        })
     })
 
     it("should reject after jwtGenerator error", async () => {
-        const error = new Error("Unable to encrypt password")
+        const error = new Error("Jwt generator error")
 
         encryptPassword.resolves(hashedPassword)
         saveUser.resolves("userId")
         jwtGenerator.rejects(error)
-        const result = await registerUser(user, db)
-
-        sinon.assert.calledWithExactly(encryptPassword, user.password)
-        sinon.assert.calledWithMatch(saveUser, userWithHashedPwd)
-        sinon.assert.calledWithExactly(jwtGenerator, "userId")
-        expect(result).toEqual(error)
+        await registerUser(user, db).catch(e => {
+            sinon.assert.calledWithExactly(encryptPassword, user.password)
+            sinon.assert.calledWithMatch(saveUser, userWithHashedPwd)
+            sinon.assert.calledWithExactly(jwtGenerator, "userId")
+            expect(e).toEqual(error)
+        })
     })
 
 })

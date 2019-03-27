@@ -1,5 +1,5 @@
 import {Db} from "../../src/postgres/Db"
-import {User} from "../../src"
+import {User} from "../../src/types"
 import {knex} from "../../../db/knex"
 
 
@@ -32,17 +32,16 @@ describe("Db", () => {
         expect(savedValue.id).toBe(id[0])
     })
 
-    it("should throw error if email is duplicate", async () => {
+    it("should throw conflict error if email is duplicate", async () => {
         const db = new Db(knex)
-        try {
-            const firstSave = await db.saveUser(payload)
-            const savedValue = await select(firstSave)
-            expect(savedValue.first_name).toBe(payload.firstName)
-            await db.saveUser(payload)
-        } catch (e) {
-            expect(e.name).toBe("error")
-            expect(e.detail).toBe('Key (email)=(test@email.com) already exists.')
-        }
+        const firstSave = await db.saveUser(payload)
+        const savedValue = await select(firstSave)
+        expect(savedValue.first_name).toBe(payload.firstName)
+        await db.saveUser(payload).catch(e => {
+            expect(e.statusCode).toBe(409)
+            expect(e.message).toBe("Email test@email.com is already in use")
+            expect(e.cause).toBe("CONFLICT")
+        })
     })
 
     async function select(id: string) {

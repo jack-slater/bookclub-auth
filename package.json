@@ -5,7 +5,7 @@
   "main": "app/src/server.ts",
   "scripts": {
     "tsc": "tsc",
-    "dev": "ts-node-dev --respawn --transpileOnly ./app/src/server.ts",
+    "dev": "knex migrate:latest && ts-node-dev --respawn --transpileOnly ./app/src/server.ts",
     "prod": "knex migrate:latest && tsc && node ./build/app/src/server.js",
     "test": "jest"
   },
@@ -18,6 +18,7 @@
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.3",
+    "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "pg": "^7.9.0",
     "ts-node-dev": "^1.0.0-pre.32",

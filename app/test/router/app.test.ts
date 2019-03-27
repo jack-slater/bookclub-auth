@@ -1,7 +1,7 @@
 import request from "supertest"
 import sinon from "sinon"
 import {app} from "../../src/router/app"
-import {ErrorMsg, Jwt, User} from "../../src"
+import {ErrorType, FormattedError, Jwt, User} from "../../src/types"
 import {Db} from "../../src/postgres/Db"
 import * as register from "../../src/service/register"
 import {knex} from "../../../db/knex"
@@ -38,23 +38,29 @@ describe("app", () => {
     });
 
     it("should send errorMsg POST", async () => {
-        const errorMsg = new ErrorMsg(404, "Not Found", "No user found")
+        const errorMsg = new FormattedError(ErrorType.NOT_FOUND, "No user found")
         regUser.rejects(errorMsg)
         const response = await request(app).post("/register").send(payload)
-        const expected = {statusCode: 404, cause: "Not Found", message: "No user found"}
+        const {statusCode, cause, message} = response.body
 
         sinon.assert.calledWithExactly(regUser, payload, db)
         expect(response.status).toBe(404);
-        expect(response.body).toEqual(expected);
+        expect(statusCode).toBe(errorMsg.statusCode)
+        expect(cause).toBe(errorMsg.cause)
+        expect(message).toBe(errorMsg.message)
     });
 
     it("should send server error POST for non specified error", async () => {
         const error = new Error()
         regUser.rejects(error)
         const response = await request(app).post("/register").send(payload)
+        const {statusCode, cause, message} = response.body
+
         sinon.assert.calledWithExactly(regUser, payload, db)
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({statusCode: 500, cause: "Server Error", message: error.message});
+        expect(statusCode).toBe(500)
+        expect(cause).toBe("SERVER_ERROR")
+        expect(message).toBe(error.message)
     });
 
 })

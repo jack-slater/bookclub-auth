@@ -1,4 +1,4 @@
-import {User} from "../Types"
+import {ErrorType, FormattedError, User} from "../types"
 import * as Knex from "knex"
 
 export class Db {
@@ -9,8 +9,13 @@ export class Db {
     }
 
     public async saveUser(user: User): Promise<any> {
-        return await this.knex("user").insert(this.prepareUser(user), "id")
+        try {
+            return await this.knex("user").insert(this.prepareUser(user), "id")
+        } catch (e) {
+            this.handleError(e, user)
+        }
     }
+
 
     private prepareUser(user: User): object {
         return {
@@ -20,5 +25,11 @@ export class Db {
             "password": user.password,
             "created_at": new Date(),
         }
+    }
+
+    private handleError(e: any, u: User) {
+        throw e.constraint === "user_email_unique"
+            ? new FormattedError(ErrorType.CONFLICT, `Email ${u.email} is already in use`)
+            : e
     }
 }
