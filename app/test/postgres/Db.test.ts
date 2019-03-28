@@ -1,7 +1,8 @@
+import sinon, {assert} from "sinon"
+import uuid from "uuid"
 import {Db} from "../../src/postgres/Db"
 import {User} from "../../src/types"
 import {knex} from "../../../db/knex"
-
 
 describe("Db", () => {
 
@@ -19,9 +20,13 @@ describe("Db", () => {
 
     afterEach(async () => {
         await knex.migrate.rollback()
+        sinon.restore()
     })
 
     it("should save user", async () => {
+        const randomId = "randomId"
+        // @ts-ignore
+        const uuidStub = sinon.stub(uuid, "v4").returns(randomId)
         const id = await new Db(knex).saveUser(payload)
         const savedValue = await select(id)
 
@@ -30,7 +35,9 @@ describe("Db", () => {
         expect(savedValue.email).toBe(payload.email)
         expect(savedValue.password).toBe(payload.password)
         expect(savedValue.admin).toBe(false)
-        expect(savedValue.id).toBe(id[0])
+        expect(savedValue.id).toBe(randomId)
+
+        assert.called(uuidStub)
     })
 
     it("should throw conflict error if email is duplicate", async () => {

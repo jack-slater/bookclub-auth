@@ -1,5 +1,6 @@
 import {ErrorType, FormattedError, User} from "../types"
 import * as Knex from "knex"
+import uuid = require("uuid")
 
 export class Db {
     knex: Knex
@@ -25,6 +26,7 @@ export class Db {
             "password": user.password,
             "admin": false,
             "created_at": new Date(),
+            "id": uuid.v4()
         }
     }
 
