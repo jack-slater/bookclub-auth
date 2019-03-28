@@ -19,4 +19,15 @@ describe("FormattedError", () => {
 
         sinon.restore()
     })
+
+    it("should create error with validationErrors", () => {
+        const validationErrors = [{validation: "error"}]
+        const message = "something has broke"
+        const formattedError = FormattedError.withValidationErr(ErrorType.SERVER_ERROR, message , validationErrors)
+
+        expect(formattedError.cause).toBe("SERVER_ERROR")
+        expect(formattedError.statusCode).toBe(500)
+        expect(formattedError.message).toBe(message)
+        expect(formattedError.validationErrors).toEqual(validationErrors)
+    })
 })

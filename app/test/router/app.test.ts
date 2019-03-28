@@ -37,6 +37,61 @@ describe("app", () => {
         expect(response.body).toEqual(jwt);
     });
 
+    it("should throw error when payload when values are empty", async () => {
+        const emptyPayload = {
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: ""
+        }
+
+        const response = await request(app).post("/register").send(emptyPayload)
+        const {statusCode, cause, message, validationErrors} = response.body
+
+        expect(statusCode).toBe(400)
+        expect(cause).toBe("BAD_REQUEST")
+        expect(message).toBe("Validation Error invalid payload")
+        expect(validationErrors).toEqual([
+            {"location": "body", "msg": "Invalid value", "param": "firstName", "value": ""},
+            {"location": "body", "msg": "Invalid value", "param": "lastName", "value": ""},
+            {"location": "body", "msg": "Invalid value", "param": "email", "value": ""},
+            {"location": "body", "msg": "Invalid value", "param": "password", "value": ""}])
+    });
+
+    it("should throw error payload when values are undefined", async () => {
+        const emptyPayload = {}
+
+        const response = await request(app).post("/register").send(emptyPayload)
+        const {statusCode, cause, message, validationErrors} = response.body
+
+        expect(statusCode).toBe(400)
+        expect(cause).toBe("BAD_REQUEST")
+        expect(message).toBe("Validation Error invalid payload")
+        expect(validationErrors).toEqual([
+            {"location": "body", "msg": "Invalid value", "param": "firstName"},
+            {"location": "body", "msg": "Invalid value", "param": "lastName"},
+            {"location": "body", "msg": "Invalid value", "param": "email"},
+            {"location": "body", "msg": "Invalid value", "param": "password"}])
+    });
+
+    it("should throw error payload when email is not valid", async () => {
+        const invaidEmail: User = {
+            firstName: "test",
+            lastName: "user",
+            email: "testemail.com",
+            password: "testPassword"
+        }
+
+        const response = await request(app).post("/register").send(invaidEmail)
+        const {statusCode, cause, message, validationErrors} = response.body
+
+        expect(statusCode).toBe(400)
+        expect(cause).toBe("BAD_REQUEST")
+        expect(message).toBe("Validation Error invalid payload")
+        expect(validationErrors).toEqual([
+            {"location": "body", "msg": "Invalid value", "param": "email", "value": "testemail.com"}])
+    });
+
     it("should send errorMsg POST", async () => {
         const errorMsg = new FormattedError(ErrorType.NOT_FOUND, "No user found")
         regUser.rejects(errorMsg)

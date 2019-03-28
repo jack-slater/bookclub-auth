@@ -1,5 +1,6 @@
 import {NextFunction, Request, Response} from "express"
 import {ErrorType, FormattedError} from "../types"
+import {validationResult} from "express-validator/check"
 
 export const clientErrHandler = (err: FormattedError, req: Request, res: Response, next: NextFunction) => {
     if (err.statusCode) {
@@ -18,5 +19,8 @@ export const serverErrHander = (err: Error, req: Request, res: Response, next: N
 
 export const asyncMiddleware = (fn: (req: Request, res: Response, next: NextFunction) => void) =>
     (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) next(FormattedError.withValidationErr(ErrorType.BAD_REQUEST,
+            "Validation Error invalid payload", errors.array()))
+        else Promise.resolve(fn(req, res, next)).catch(next);
 };
