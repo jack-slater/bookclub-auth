@@ -23,6 +23,7 @@ export class Db {
             "last_name": user.lastName,
             "email": user.email,
             "password": user.password,
+            "admin": false,
             "created_at": new Date(),
         }
     }

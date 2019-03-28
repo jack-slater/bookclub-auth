@@ -7,8 +7,8 @@ exports.up = (knex, Promise) => {
         table.string('last_name').notNull()
         table.string('email').notNull()
         table.string('password').notNull()
+        table.boolean('admin').notNull()
         table.unique("email")
-        table.unique("id")
     })
 }
 

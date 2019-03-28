@@ -29,6 +29,7 @@ describe("Db", () => {
         expect(savedValue.last_name).toBe(payload.lastName)
         expect(savedValue.email).toBe(payload.email)
         expect(savedValue.password).toBe(payload.password)
+        expect(savedValue.admin).toBe(false)
         expect(savedValue.id).toBe(id[0])
     })
 

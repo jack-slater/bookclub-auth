@@ -1,7 +1,7 @@
 import request from "supertest"
 import sinon from "sinon"
 import {app} from "../../src/router/app"
-import {ErrorType, FormattedError, Jwt, User} from "../../src/types"
+import {ErrorType, FormattedError, JwtResponse, User} from "../../src/types"
 import {Db} from "../../src/postgres/Db"
 import * as register from "../../src/service/register"
 import {knex} from "../../../db/knex"
@@ -17,7 +17,7 @@ describe("app", () => {
 
     const db = new Db(knex)
 
-    let regUser: sinon.SinonStub<[User, Db], Promise<Jwt>>
+    let regUser: sinon.SinonStub<[User, Db], Promise<JwtResponse>>
 
     beforeEach(() => {
         regUser = sinon.stub(register, "registerUser")
@@ -28,7 +28,7 @@ describe("app", () => {
     })
 
     it("should successfully POST new user", async () => {
-        const jwt: Jwt = {jwt: "test"}
+        const jwt: JwtResponse = {jwt: "test"}
         regUser.resolves(jwt)
 
         const response = await request(app).post("/register").send(payload)

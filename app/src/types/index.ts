@@ -1,4 +1,4 @@
 export {User} from "./User"
-export {Jwt} from "./Jwt"
+export {JwtResponse} from "./JwtResponse"
 export {FormattedError} from "./FormattedError"
 export {ErrorType} from "./ErrorType"

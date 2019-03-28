@@ -1,6 +1,6 @@
 import sinon from "sinon"
 import {registerUser} from "../../src/service/register"
-import {Jwt, User} from "../../src/types"
+import {JwtResponse, User} from "../../src/types"
 import {Db} from "../../src/postgres/Db"
 import * as encrypter from "../../src/service/encryptPassword"
 import * as jwt from "../../src/service/jwt"
@@ -30,8 +30,8 @@ describe("registerUser", () => {
     const jwtValue = {jwt: "jwt"}
 
     let encryptPassword: sinon.SinonStub<[string], Promise<string>>,
-        jwtGenerator: sinon.SinonStub<[string], Promise<Jwt>>,
-        saveUser: sinon.SinonStub<[User], Promise<string>>
+        jwtGenerator: sinon.SinonStub<[string], Promise<JwtResponse>>,
+        saveUser: sinon.SinonStub<[User], Promise<any>>
 
     beforeEach(() => {
         encryptPassword = sinon.stub(encrypter, "encryptPassword")
@@ -54,6 +54,16 @@ describe("registerUser", () => {
         sinon.assert.calledWithExactly(encryptPassword, user.password)
         sinon.assert.calledWithMatch(saveUser, userWithHashedPwd)
         sinon.assert.calledWithExactly(jwtGenerator, "userId")
+        expect(result).toEqual(jwtValue)
+    })
+
+    it("should convert numeric id to string", async () => {
+        encryptPassword.resolves(hashedPassword)
+        saveUser.resolves(123)
+        jwtGenerator.resolves(jwtValue)
+        const result = await registerUser(user, db)
+
+        sinon.assert.calledWithExactly(jwtGenerator, "123")
         expect(result).toEqual(jwtValue)
     })
 
@@ -82,7 +92,7 @@ describe("registerUser", () => {
     })
 
     it("should reject after jwtGenerator error", async () => {
-        const error = new Error("Jwt generator error")
+        const error = new Error("JwtResponse generator error")
 
         encryptPassword.resolves(hashedPassword)
         saveUser.resolves("userId")
