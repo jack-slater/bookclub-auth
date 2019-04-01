@@ -6,10 +6,10 @@ jobs:
       - image: circleci/node:11.12
 
       - image: circleci/postgres:latest
-        - environment:
-            - POSTGRES_USER: test
-            - POSTGRES_PASSWORD: secretTest
-            - POSTGRES_DB: bookclub-test
+        environment:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: secretTest
+          POSTGRES_DB: bookclub-test
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
