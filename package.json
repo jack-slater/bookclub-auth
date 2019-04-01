@@ -4,13 +4,15 @@
   "description": "",
   "main": "app/src/server.ts",
   "engines" : {
-    "node" : ">=10.0.0"
+    "node" : ">=11.12.0"
   },
   "scripts": {
     "tsc": "tsc",
-    "dev": "knex migrate:latest && ts-node-dev --respawn --transpileOnly ./app/src/server.ts",
-    "prod": "knex migrate:latest && tsc && node ./build/app/src/server.js",
-    "test": "jest"
+    "dev": "knex migrate:latest --env development && ts-node-dev --respawn --transpileOnly ./app/src/server.ts",
+    "prod": "knex migrate:latest --env production && tsc && node ./build/app/src/server.js",
+    "postgres:start": "npm run postgres:stop && docker run -p5432:5432 --name bookclub-postgres-test  -e POSTGRES_USER=test -e POSTGRES_PASSWORD=secretTest -e POSTGRES_DB=bookclub-test -d postgres",
+    "postgres:stop": "docker rm -f bookclub-postgres-test",
+    "test": "npm run postgres:start && sleep 2 && knex migrate:latest --env test && jest && npm run postgres:stop"
   },
   "keywords": [],
   "author": "",

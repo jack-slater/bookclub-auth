@@ -1,0 +1,8 @@
+node_modules/
+Dockerfile
+.gitignore
+.git
+.circleci/
+.idea/
+build/
+logs/

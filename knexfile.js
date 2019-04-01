@@ -3,8 +3,7 @@ require("dotenv").config()
 module.exports = {
     test: {
         client: 'pg',
-       // connection: "postgres://admin:mysecretpassword@0.0.0.0:5433/bookclub-test",
-        connection: process.env.PG_CONNECTION_STRING,
+        connection: "postgres://test:secretTest@localhost:5432/bookclub-test",
         migrations: {
             directory: __dirname + '/db/migrations'
         },
@@ -24,13 +23,7 @@ module.exports = {
     },
     production: {
         client: 'pg',
-        connection: {
-            host: process.env.PGHOST,
-            user: process.env.PGUSER,
-            password: process.env.PGPASSWORD,
-            database: process.env.PGDATABASE,
-            port: process.env.PGPORT
-        },
+        connection: process.env.PG_CONNECTION_STRING,
         migrations: {
             directory: __dirname + '/db/migrations'
         },
