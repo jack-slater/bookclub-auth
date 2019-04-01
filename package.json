@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app/src/server.ts",
+  "engines" : {
+    "node" : ">=10.0.0"
+  },
   "scripts": {
     "tsc": "tsc",
     "dev": "knex migrate:latest && ts-node-dev --respawn --transpileOnly ./app/src/server.ts",
