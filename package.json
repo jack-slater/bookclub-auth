@@ -12,7 +12,8 @@
     "prod": "knex migrate:latest --env production && tsc && node ./build/app/src/server.js",
     "postgres:start": "npm run postgres:stop && docker run -p5432:5432 --name bookclub-postgres-test  -e POSTGRES_USER=test -e POSTGRES_PASSWORD=secretTest -e POSTGRES_DB=bookclub-test -d postgres",
     "postgres:stop": "docker rm -f bookclub-postgres-test",
-    "test": "npm run postgres:start && sleep 2 && knex migrate:latest --env test && jest && npm run postgres:stop"
+    "test": "knex migrate:latest --env test && jest",
+    "test-local": "npm run postgres:start && sleep 2 && knex migrate:latest --env test && jest && npm run postgres:stop"
   },
   "keywords": [],
   "author": "",
